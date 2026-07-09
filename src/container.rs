@@ -27,6 +27,11 @@ pub struct Container {
 }
 
 impl Container {
+    /// Create an empty container.
+    pub fn new() -> Self {
+        Self::default()
+    }
+
     /// Data files in the container.
     pub fn data_files(&self) -> &[DataFile] {
         &self.data_files
@@ -35,6 +40,40 @@ impl Container {
     /// Signature documents in the container.
     pub fn signatures(&self) -> &[SignatureFile] {
         &self.signatures
+    }
+
+    /// Add a data file.
+    pub fn add_file(
+        &mut self,
+        name: impl Into<String>,
+        mime_type: impl Into<String>,
+        content: Vec<u8>,
+    ) -> Result<()> {
+        let name = name.into();
+        validate_entry_name(&name)?;
+        if self.data_files.iter().any(|f| f.name == name) {
+            return Err(LibError::Container(format!("duplicate file name: {name}")));
+        }
+        self.data_files.push(DataFile {
+            name,
+            mime_type: mime_type.into(),
+            content,
+        });
+        Ok(())
+    }
+
+    /// Append a signature document.
+    pub fn add_signature_xml(&mut self, xml: String) -> &SignatureFile {
+        let mut n = self.signatures.len();
+        let name = loop {
+            let candidate = format!("META-INF/signatures{n}.xml");
+            if !self.signatures.iter().any(|s| s.name == candidate) {
+                break candidate;
+            }
+            n += 1;
+        };
+        self.signatures.push(SignatureFile { name, xml });
+        self.signatures.last().expect("a signature should exist")
     }
 
     fn open<R: Read + Seek>(reader: R) -> Result<Self> {
@@ -188,6 +227,21 @@ fn read_entry<R: Read + Seek>(zip: &mut ZipArchive<R>, name: &str) -> Result<Vec
     let mut buf = Vec::with_capacity(entry.size() as usize);
     entry.read_to_end(&mut buf)?;
     Ok(buf)
+}
+
+fn validate_entry_name(name: &str) -> Result<()> {
+    if name.is_empty() {
+        return Err(LibError::Container("file name must not be empty".into()));
+    }
+    if name == "mimetype" || name.starts_with("META-INF/") {
+        return Err(LibError::Container(format!("reserved entry name: {name}")));
+    }
+    if name.starts_with('/') || name.split('/').any(|part| part == ".." || part.is_empty()) {
+        return Err(LibError::Container(format!(
+            "file name must be a clean relative path: {name}"
+        )));
+    }
+    Ok(())
 }
 
 fn is_signature_entry(meta_inf_rest: &str) -> bool {

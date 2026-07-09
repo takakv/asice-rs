@@ -9,7 +9,7 @@ pub use container::{Container, DataFile, SignatureFile};
 pub const MIMETYPE: &str = "application/vnd.etsi.asic-e+zip";
 
 /// OpenDocument manifest namespace (META-INF/manifest.xml).
-pub const MANIFEST_NS: &str = "urn:oasis:names:tc:opendocument:xmlns:manifest:1.0";
+pub(crate) const MANIFEST_NS: &str = "urn:oasis:names:tc:opendocument:xmlns:manifest:1.0";
 
 /// Errors produced while reading or writing containers.
 #[derive(Error, Debug)]
