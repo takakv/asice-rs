@@ -25,7 +25,10 @@ pub(crate) fn parse(bytes: &[u8]) -> Result<Vec<(String, String)>> {
 pub(crate) fn build(files: &[DataFile]) -> Vec<u8> {
     let mut w = uppsala::XmlWriter::new();
     w.write_declaration();
-    w.start_element("manifest:manifest", &[("xmlns:manifest", MANIFEST_NS)]);
+    w.start_element(
+        "manifest:manifest",
+        &[("xmlns:manifest", MANIFEST_NS), ("manifest:version", "1.2")],
+    );
     w.empty_element(
         "manifest:file-entry",
         &[
