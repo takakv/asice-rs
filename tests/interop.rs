@@ -1,5 +1,12 @@
 use asice::Container;
 
+const TEST_TXT: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/fixtures/test.txt");
+
+const SIGNATURES0_XML: &str = concat!(
+    env!("CARGO_MANIFEST_DIR"),
+    "/tests/fixtures/signatures0.xml"
+);
+
 // Containers from https://github.com/open-eid/SiVa
 const BDOC_TM_2_SIG: &str = concat!(
     env!("CARGO_MANIFEST_DIR"),
@@ -50,4 +57,29 @@ fn round_trip() {
     assert_eq!(reopened.signatures()[0].xml, container.signatures()[0].xml);
     assert_eq!(reopened.signatures()[1].name, "META-INF/signatures1.xml");
     assert_eq!(reopened.signatures()[1].xml, container.signatures()[1].xml);
+}
+
+#[test]
+fn builds_container_with_file_and_signature() {
+    let content = std::fs::read(TEST_TXT).unwrap();
+    let xml = std::fs::read_to_string(SIGNATURES0_XML).unwrap();
+
+    let mut container = Container::new();
+    container
+        .add_file("test.txt", "text/plain", content.clone())
+        .unwrap();
+    container.add_signature_xml(xml.clone());
+
+    assert_eq!(container.data_files().len(), 1);
+    assert_eq!(container.data_files()[0].name, "test.txt");
+    assert_eq!(container.data_files()[0].content, content);
+    assert_eq!(container.signatures().len(), 1);
+    assert_eq!(container.signatures()[0].name, "META-INF/signatures0.xml");
+    assert_eq!(container.signatures()[0].xml, xml);
+
+    let reopened = Container::from_bytes(&container.to_bytes().unwrap()).unwrap();
+    assert_eq!(reopened.data_files()[0].name, "test.txt");
+    assert_eq!(reopened.data_files()[0].content, content);
+    assert_eq!(reopened.signatures()[0].name, "META-INF/signatures0.xml");
+    assert_eq!(reopened.signatures()[0].xml, xml);
 }
