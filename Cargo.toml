@@ -1,8 +1,8 @@
 [package]
-name = "asice"
-version = "0.2.1"
+name = "asic-e"
+version = "0.1.0"
 edition = "2024"
-description = "ASiC-E container format (ETSI EN 319 162-1) with the BDOC profile"
+description = "Build and parse ASiC-E containers"
 license = "Apache-2.0"
 homepage = "https://github.com/takakv/rust-asice"
 repository = "https://github.com/takakv/rust-asice"

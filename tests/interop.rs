@@ -1,4 +1,4 @@
-use asice::Container;
+use asic_e::Container;
 
 const TEST_TXT: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/fixtures/test.txt");
 
