@@ -220,6 +220,11 @@ impl Container {
         Self::open(Cursor::new(bytes))
     }
 
+    /// Open a container from a byte buffer under an explicit policy.
+    pub fn from_bytes_with(bytes: &[u8], opts: &OpenOptions) -> Result<Self> {
+        Self::open_with(Cursor::new(bytes), opts)
+    }
+
     /// Open a container file from disk.
     pub fn open_file(path: impl AsRef<std::path::Path>) -> Result<Self> {
         Self::open(std::fs::File::open(path)?)
