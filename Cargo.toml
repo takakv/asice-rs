@@ -4,8 +4,8 @@ version = "0.2.1"
 edition = "2024"
 description = "ASiC-E container format (ETSI EN 319 162-1) with the BDOC profile"
 license = "Apache-2.0"
-homepage = "https://github.com/takakv/asice-rs"
-repository = "https://github.com/takakv/asice-rs"
+homepage = "https://github.com/takakv/rust-asice"
+repository = "https://github.com/takakv/rust-asice"
 keywords = ["asice", "eidas", "bdoc", "digidoc"]
 
 [dependencies]
