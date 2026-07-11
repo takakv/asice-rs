@@ -70,6 +70,11 @@ impl Container {
         &self.signatures
     }
 
+    /// Structural warnings collected when opening the container.
+    pub fn warnings(&self) -> &[String] {
+        &self.warnings
+    }
+
     /// Add a data file.
     ///
     /// # Errors
